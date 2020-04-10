@@ -1,17 +1,43 @@
 <template>
   <div id="app">
-    <Syncify/>
+    <Syncify></Syncify>
   </div>
 </template>
 
 <script>
-import Syncify from './components/Syncify.vue'
+import Syncify from '@/components/Syncify'
 
 export default {
   name: 'App',
   components: {
     Syncify
+  },
+  mounted: function() {
+    let fullPath = this.$route.fullPath
+    if (fullPath !== '/') {
+      let paramsList = fullPath.substring(2).split(/=|&/)
+      let params = {}
+      for (let i = 0; i < paramsList.length - 1; i += 2) {
+        params[paramsList[i]] = paramsList[i + 1]
+      }
+      this.$store.commit('setAccessToken', params.access_token)
+      this.$router.push({name: 'App'})
+    }
+    else {
+      if (this.$store.state.accessToken === "") {
+        const data = {
+          client_id: process.env.VUE_APP_CLIENT_ID,
+          response_type: 'token',
+          redirect_uri: 'http://localhost:8080',
+          scope: 'user-read-playback-state streaming user-read-email user-read-private user-modify-playback-state'
+        }
+
+        window.open('https://accounts.spotify.com/authorize?' + new URLSearchParams(data).toString(), '_self')
+      }
+    }
+
   }
+
 }
 </script>
 
