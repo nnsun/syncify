@@ -5,12 +5,9 @@
     <p>{{ album }}</p>
 
     <div v-if='ready'>
-
-    <button @click="previousTrack">Previous</button>
-    <button @click="togglePlay">Play</button>
-    <button @click="nextTrack">Next</button>
-    <button @click="shuffle">Shuffle</button>
-
+      <button @click="previousTrack">Previous</button>
+      <button @click="togglePlay">Play</button>
+      <button @click="nextTrack">Next</button>
     </div>
 
   </div>
@@ -40,9 +37,6 @@ export default {
     },
     nextTrack: function() {
       this.player.nextTrack()
-    },
-    shuffle: function() {
-      console.log(Object.getOwnPropertyNames(this.player))
     }
   },
 
