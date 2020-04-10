@@ -15,6 +15,7 @@
 
 <script>
 const axios = require('axios')
+const io = require('socket.io-client')
 
 export default {
   name: 'Syncify',
@@ -41,8 +42,26 @@ export default {
   },
 
   created: function() {
+    const token = this.$store.state.accessToken
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }
+
+    const socket = io.connect('http://localhost:3000')
+
+    socket.on('update', function(state) {
+
+      const data = {
+        uri: state.track_window.current_track.uri,
+        position: state.position
+      }
+
+      axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
+    })
+
     window.onSpotifyWebPlaybackSDKReady = () => {
-      const token = this.$store.state.accessToken
       this.player = new window.Spotify.Player({
         name: 'Web Playback SDK Quick Start Player',
         getOAuthToken: cb => { cb(token) }
@@ -51,11 +70,6 @@ export default {
       this.player.addListener('ready', ({ device_id }) => {
         this.ready = true
 
-        const config = {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
-        }
         const data = {
           device_ids: [
             device_id
@@ -68,6 +82,8 @@ export default {
         this.song = state.track_window.current_track.name
         this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
         this.album = state.track_window.current_track.album.name
+
+        socket.emit('update', state)
       })
 
       this.player.connect()
