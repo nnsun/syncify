@@ -4,7 +4,7 @@
     <p>{{ artists }}</p>
     <p>{{ album }}</p>
 
-    <div v-if='ready'>
+    <div v-if="ready">
       <button @click="previousTrack">Previous</button>
       <button @click="togglePlay">Play</button>
       <button @click="nextTrack">Next</button>
