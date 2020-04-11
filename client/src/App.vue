@@ -25,10 +25,12 @@ export default {
     }
     else {
       if (this.$store.state.accessToken === "") {
+        const host = 'http://' + (process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_IP_ADDR : 'localhost')
+        const port = 8080
         const data = {
           client_id: process.env.VUE_APP_CLIENT_ID,
           response_type: 'token',
-          redirect_uri: 'http://localhost:8080',
+          redirect_uri: host + ':' + port,
           scope: 'user-read-playback-state streaming user-read-email user-read-private user-modify-playback-state'
         }
 
