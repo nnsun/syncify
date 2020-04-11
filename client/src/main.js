@@ -16,7 +16,8 @@ const router = new VueRouter({
       path: '/',
       component: App
     },
-  ]
+  ],
+  base: process.env.NODE_ENV === 'production' ? '/syncify/' : '/'
 })
 
 new Vue({

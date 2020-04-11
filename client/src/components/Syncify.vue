@@ -48,9 +48,8 @@ export default {
         Authorization: 'Bearer ' + token
       }
     }
-    const host = 'http://' + (process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_IP_ADDR : 'localhost')
-    const port = 3000
-    const socket = io.connect(host + ':' + port)
+    const serverAddr = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_ADDR : 'http://localhost:3000'
+    const socket = io.connect(serverAddr)
 
     socket.on('update', function(state) {
       console.log(state)
