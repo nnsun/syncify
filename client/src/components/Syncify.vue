@@ -53,7 +53,7 @@ export default {
     const socket = io.connect(host + ':' + port)
 
     socket.on('update', function(state) {
-
+      console.log(state)
       const data = {
         uri: state.track_window.current_track.uri,
         position: state.position
@@ -67,6 +67,8 @@ export default {
         name: 'Web Playback SDK Quick Start Player',
         getOAuthToken: cb => { cb(token) }
       })
+
+      this.player.addListener('initialization_error', ({ message }) => { console.error(message) })
 
       this.player.addListener('ready', ({ device_id }) => {
         this.ready = true
