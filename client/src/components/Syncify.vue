@@ -25,7 +25,11 @@ export default {
       ready: false,
       song: '',
       artists: '',
-      album: ''
+      album: '',
+      uri: '',
+      last_timestamp: null,
+      last_position: null,
+      paused: true
     }
   },
 
@@ -51,14 +55,23 @@ export default {
     const serverAddr = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_ADDR : 'http://localhost:3000'
     const socket = io.connect(serverAddr)
 
-    socket.on('update', function(state) {
-      console.log(state)
-      const data = {
-        uri: state.track_window.current_track.uri,
-        position: state.position
-      }
+    socket.on('pause', function() {
+      this.player.pause()
+    })
 
-      axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
+    socket.on('resume', function() {
+      this.player.resume()
+    })
+
+    socket.on('seek', function(position) {
+      this.player.seek(position)
+    })
+
+    socket.on('song', function(uri) {
+      const data = {
+        uris: uri,
+      }
+      axios.put('https://api.spotify.com/v1/me/player/play', data, config).then(res => console.log(res)).catch(err => console.error(err))
     })
 
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -81,11 +94,44 @@ export default {
       })
 
       this.player.addListener('player_state_changed', state => {
-        this.song = state.track_window.current_track.name
-        this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
-        this.album = state.track_window.current_track.album.name
 
-        socket.emit('update', state)
+        // account for Spotify bug where sometimes position is in seconds
+        if (state.position % 1 !== 0) {
+          state.position *= 1000
+        }
+
+        const diff = Math.abs((state.timestamp - this.last_timestamp) - (state.position - this.last_position))
+        this.last_position = state.position
+        this.last_timestamp = state.timestamp
+        if (this.paused === state.paused) {
+          if (diff > 1000) {
+            this.position = state.position
+            socket.emit('seek', state.position)
+          }
+        }
+        else {
+          this.paused = state.paused
+          if (this.paused) {
+            socket.emit('pause')
+          }
+          else {
+            socket.emit('resume')
+          }
+          return
+        }
+
+        let uri = state.track_window.current_track.uri
+        if (uri !== this.uri) {
+          this.uri = uri
+          this.song = state.track_window.current_track.name
+          this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
+          this.album = state.track_window.current_track.album.name
+          socket.emit('update', state)
+          return
+        }
+
+
+
       })
 
       this.player.connect()
