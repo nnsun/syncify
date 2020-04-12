@@ -100,6 +100,15 @@ export default {
           state.position *= 1000
         }
 
+        let uri = state.track_window.current_track.uri
+        if (uri !== this.uri) {
+          this.uri = uri
+          this.song = state.track_window.current_track.name
+          this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
+          this.album = state.track_window.current_track.album.name
+          socket.emit('song', state)
+        }
+
         const diff = Math.abs((state.timestamp - this.last_timestamp) - (state.position - this.last_position))
         this.last_position = state.position
         this.last_timestamp = state.timestamp
@@ -117,16 +126,6 @@ export default {
           else {
             socket.emit('resume')
           }
-          return
-        }
-
-        let uri = state.track_window.current_track.uri
-        if (uri !== this.uri) {
-          this.uri = uri
-          this.song = state.track_window.current_track.name
-          this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
-          this.album = state.track_window.current_track.album.name
-          socket.emit('update', state)
           return
         }
       })
