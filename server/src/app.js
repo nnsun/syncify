@@ -11,7 +11,6 @@ const server = app.listen(process.env.PORT || 3000)
 const io = require('socket.io')(server)
 
 io.on('connection', function(socket) {
-
   socket.on('pause', function() {
     socket.broadcast.emit('pause')
   })
@@ -21,7 +20,7 @@ io.on('connection', function(socket) {
   })
 
   socket.on('seek', function(position) {
-    socket.broadcast.emit('update', position)
+    socket.broadcast.emit('seek', position)
   })
 
   socket.on('song', function(uri) {

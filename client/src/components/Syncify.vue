@@ -55,23 +55,23 @@ export default {
     const serverAddr = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_ADDR : 'http://localhost:3000'
     const socket = io.connect(serverAddr)
 
-    socket.on('pause', function() {
+    socket.on('pause', () => {
       this.player.pause()
     })
 
-    socket.on('resume', function() {
+    socket.on('resume', () => {
       this.player.resume()
     })
 
-    socket.on('seek', function(position) {
+    socket.on('seek', position => {
       this.player.seek(position)
     })
 
-    socket.on('song', function(uri) {
+    socket.on('song', uri => {
       const data = {
-        uris: uri,
+        uris: [uri]
       }
-      axios.put('https://api.spotify.com/v1/me/player/play', data, config).then(res => console.log(res)).catch(err => console.error(err))
+      axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
     })
 
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -129,9 +129,6 @@ export default {
           socket.emit('update', state)
           return
         }
-
-
-
       })
 
       this.player.connect()
