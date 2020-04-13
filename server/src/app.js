@@ -20,7 +20,7 @@ io.on('connection', function(socket) {
   })
 
   socket.on('seek', function(position) {
-    socket.broadcast.emit('seek', position)
+    // socket.broadcast.emit('seek', position)
   })
 
   socket.on('song', function(uri) {

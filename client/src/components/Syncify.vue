@@ -56,18 +56,22 @@ export default {
     const socket = io.connect(serverAddr)
 
     socket.on('pause', () => {
+      console.log('pause message received')
       this.player.pause()
     })
 
     socket.on('resume', () => {
+      console.log('resume message received')
       this.player.resume()
     })
 
     socket.on('seek', position => {
+      console.log('seek message received')
       this.player.seek(position)
     })
 
     socket.on('song', uri => {
+      console.log('song message received')
       const data = {
         uris: [uri]
       }
