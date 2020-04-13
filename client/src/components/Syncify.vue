@@ -71,6 +71,7 @@ export default {
       const data = {
         uris: [uri]
       }
+      console.log(data)
       axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
     })
 
@@ -106,7 +107,7 @@ export default {
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
           this.album = state.track_window.current_track.album.name
-          socket.emit('song', state)
+          socket.emit('song', uri)
         }
 
         const diff = Math.abs((state.timestamp - this.last_timestamp) - (state.position - this.last_position))
