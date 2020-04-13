@@ -6,7 +6,7 @@
 
     <div v-if="ready">
       <button @click="previousTrack">Previous</button>
-      <button @click="togglePlay">Play</button>
+      <button @click="togglePlay">{{ paused ? 'Play' : 'Pause' }}</button>
       <button @click="nextTrack">Next</button>
     </div>
 
@@ -75,7 +75,6 @@ export default {
       const data = {
         uris: [uri]
       }
-      console.log(data)
       axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
     })
 
