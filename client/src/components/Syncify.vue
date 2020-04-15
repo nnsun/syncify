@@ -6,7 +6,8 @@
 
     <div v-if="ready">
       <button @click="previousTrack">Previous</button>
-      <button @click="togglePlay">{{ paused ? 'Play' : 'Pause' }}</button>
+      <button v-if="paused" @click="resume">{{ 'Play' }}</button>
+      <button v-else @click="pause">{{ 'Pause' }}</button>
       <button @click="nextTrack">Next</button>
     </div>
 
@@ -27,15 +28,22 @@ export default {
       artists: '',
       album: '',
       uri: '',
-      last_timestamp: null,
-      last_position: null,
-      paused: true
+      paused: true,
+      socket: null,
+      display_name: ''
     }
   },
 
   methods: {
-    togglePlay: function() {
-      this.player.togglePlay()
+    resume: function() {
+      this.player.resume()
+      this.socket.emit('resume')
+      this.paused = false
+    },
+    pause: function() {
+      this.player.pause()
+      this.socket.emit('pause')
+      this.paused = true
     },
     previousTrack: function() {
       this.player.previousTrack()
@@ -53,29 +61,37 @@ export default {
       }
     }
     const serverAddr = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_ADDR : 'http://localhost:3000'
-    const socket = io.connect(serverAddr)
+    this.socket = io.connect(serverAddr)
 
-    socket.on('pause', () => {
+    this.socket.on('connect', () => {
+      axios.get('https://api.spotify.com/v1/me', config).then(res => {
+        this.display_name = res.data.display_name
+        this.socket.emit('info', this.display_name)
+      }).catch(err => console.log(err.response))
+
+    })
+
+    this.socket.on('pause', () => {
       console.log('pause message received')
       this.player.pause()
     })
 
-    socket.on('resume', () => {
+    this.socket.on('resume', () => {
       console.log('resume message received')
       this.player.resume()
     })
 
-    socket.on('seek', position => {
+    this.socket.on('seek', position => {
       console.log('seek message received')
       this.player.seek(position)
     })
 
-    socket.on('song', uri => {
+    this.socket.on('song', uri=> {
       console.log('song message received')
       const data = {
-        uris: [uri]
+        uris: [uri],
       }
-      axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err))
+      axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err.response))
     })
 
     window.onSpotifyWebPlaybackSDKReady = () => {
@@ -94,7 +110,7 @@ export default {
             device_id
           ]
         }
-        axios.put('https://api.spotify.com/v1/me/player', data, config).catch(err => console.error(err))
+        axios.put('https://api.spotify.com/v1/me/player', data, config).catch(err => console.error(err.response))
       })
 
       this.player.addListener('player_state_changed', state => {
@@ -104,33 +120,17 @@ export default {
           state.position *= 1000
         }
 
+        this.paused = state.paused
+        console.log(state, state.track_window.current_track.name)
+
         let uri = state.track_window.current_track.uri
+        let context = state.context.uri
         if (uri !== this.uri) {
           this.uri = uri
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
           this.album = state.track_window.current_track.album.name
-          socket.emit('song', uri)
-        }
-
-        const diff = Math.abs((state.timestamp - this.last_timestamp) - (state.position - this.last_position))
-        this.last_position = state.position
-        this.last_timestamp = state.timestamp
-        if (this.paused === state.paused) {
-          if (diff > 1000) {
-            this.position = state.position
-            socket.emit('seek', state.position)
-          }
-        }
-        else {
-          this.paused = state.paused
-          if (this.paused) {
-            socket.emit('pause')
-          }
-          else {
-            socket.emit('resume')
-          }
-          return
+          this.socket.emit('song', uri, context)
         }
       })
 
