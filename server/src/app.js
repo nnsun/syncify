@@ -17,6 +17,7 @@ io.on('connect', function(socket) {
   socket.on('info', function(display_name) {
     this.display_name = display_name
     room_users.push(display_name)
+    socket.emit('users', room_users)
   })
 
   socket.on('disconnect', function() {
@@ -25,7 +26,7 @@ io.on('connect', function(socket) {
     if (index > -1) {
       room_users.splice(index, 1);
     }
-    console.log(room_users)
+    socket.broadcast.emit('users', room_users)
   })
 
   socket.on('pause', function() {

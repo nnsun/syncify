@@ -11,6 +11,16 @@
       <button @click="nextTrack">Next</button>
     </div>
 
+    <div class="slider-div">
+      <input type="range" min="0" max="1000" value="0" class="slider">
+    </div>
+    <div>{{ songLength }}</div>
+
+    <div>
+      <h3>Users</h3>
+      <p v-for="user in users" :key="user">{{ user }}</p>
+    </div>
+
   </div>
 </template>
 
@@ -26,11 +36,12 @@ export default {
       ready: false,
       song: '',
       artists: '',
+      length: NaN,
       album: '',
       uri: '',
       paused: true,
       socket: null,
-      display_name: ''
+      users: []
     }
   },
 
@@ -53,6 +64,12 @@ export default {
     }
   },
 
+  computed: {
+    songLength: function() {
+      return Math.floor(this.length / 60) + ':' + Math.floor(this.length % 60)
+    }
+  },
+
   created: function() {
     const token = this.$store.state.accessToken
     const config = {
@@ -65,10 +82,12 @@ export default {
 
     this.socket.on('connect', () => {
       axios.get('https://api.spotify.com/v1/me', config).then(res => {
-        this.display_name = res.data.display_name
-        this.socket.emit('info', this.display_name)
+        this.socket.emit('info', res.data.display_name)
       }).catch(err => console.log(err.response))
+    })
 
+    this.socket.on('users', users => {
+      this.users = users
     })
 
     this.socket.on('pause', () => {
@@ -129,6 +148,7 @@ export default {
           this.uri = uri
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
+          this.length = state.track_window.current_track.duration_ms / 1000
           this.album = state.track_window.current_track.album.name
           this.socket.emit('song', uri, context)
         }
@@ -141,4 +161,12 @@ export default {
 </script>
 
 <style scoped>
+.slider-div {
+  width: 100%
+}
+
+.slider {
+  width: 50%,
+
+}
 </style>
