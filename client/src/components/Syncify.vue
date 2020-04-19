@@ -59,7 +59,12 @@ export default {
       this.paused = true
     },
     previousTrack: function() {
-      this.player.previousTrack()
+      if (this.progress === 0) {
+        this.player.previousTrack()
+      }
+      else {
+        this.player.seek(0)
+      }
     },
     nextTrack: function() {
       this.player.nextTrack()
@@ -117,6 +122,7 @@ export default {
     this.socket.on('seek', position => {
       console.log('seek message received')
       this.player.seek(position)
+      this.progress = position / 100
     })
 
     this.socket.on('song', uri=> {
@@ -130,7 +136,6 @@ export default {
     setInterval(() => {
       if (!this.paused) {
         this.progress = parseInt(this.progress) + 1
-        console.log(this.progress)
       }
     }, 100)
 
@@ -167,12 +172,13 @@ export default {
 
         let uri = state.track_window.current_track.uri
         let context = state.context.uri
-        if (uri !== this.uri) {
+        if (uri !== this.uri || state.position == 0) {
           this.uri = uri
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
           this.length = state.track_window.current_track.duration_ms
           this.album = state.track_window.current_track.album.name
+          this.progress = Math.floor(state.position / 100)
           this.socket.emit('song', uri, context)
         }
       })
