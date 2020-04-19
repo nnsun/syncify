@@ -12,9 +12,10 @@
     </div>
 
     <div class="slider-div">
-      <input type="range" min="0" max="1000" value="0" class="slider">
+      <span>{{ songProgress }}</span>
+      <input type="range" min="0" :max="length / 100" v-model="progress" class="slider" @change=seek>
+      <span>{{ songLength }}</span>
     </div>
-    <div>{{ songLength }}</div>
 
     <div>
       <h3>Users</h3>
@@ -41,7 +42,8 @@ export default {
       uri: '',
       paused: true,
       socket: null,
-      users: []
+      users: [],
+      progress: 0
     }
   },
 
@@ -61,12 +63,24 @@ export default {
     },
     nextTrack: function() {
       this.player.nextTrack()
+    },
+    seek: function() {
+      this.player.seek(this.progress * 100)
+      this.socket.emit('seek', this.progress * 100)
     }
   },
 
   computed: {
     songLength: function() {
-      return Math.floor(this.length / 60) + ':' + Math.floor(this.length % 60)
+      const minutes = Math.floor(this.length / (60 * 1000))
+      const seconds = Math.floor(this.length % (60 * 1000) / 1000)
+      return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
+    },
+
+    songProgress: function() {
+      const minutes = Math.floor(this.progress / (60 * 10))
+      const seconds = Math.floor(this.progress % (60 * 10) / 10)
+      return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
     }
   },
 
@@ -113,6 +127,13 @@ export default {
       axios.put('https://api.spotify.com/v1/me/player/play', data, config).catch(err => console.error(err.response))
     })
 
+    setInterval(() => {
+      if (!this.paused) {
+        this.progress = parseInt(this.progress) + 1
+        console.log(this.progress)
+      }
+    }, 100)
+
     window.onSpotifyWebPlaybackSDKReady = () => {
       this.player = new window.Spotify.Player({
         name: 'Web Playback SDK Quick Start Player',
@@ -133,6 +154,9 @@ export default {
       })
 
       this.player.addListener('player_state_changed', state => {
+        if (state == null) {
+          return
+        }
 
         // account for Spotify bug where sometimes position is in seconds
         if (state.position % 1 !== 0) {
@@ -140,7 +164,6 @@ export default {
         }
 
         this.paused = state.paused
-        console.log(state, state.track_window.current_track.name)
 
         let uri = state.track_window.current_track.uri
         let context = state.context.uri
@@ -148,7 +171,7 @@ export default {
           this.uri = uri
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
-          this.length = state.track_window.current_track.duration_ms / 1000
+          this.length = state.track_window.current_track.duration_ms
           this.album = state.track_window.current_track.album.name
           this.socket.emit('song', uri, context)
         }
@@ -162,11 +185,10 @@ export default {
 
 <style scoped>
 .slider-div {
-  width: 100%
+  width: 100%;
 }
 
 .slider {
-  width: 50%,
-
+  width: 1000px;
 }
 </style>

@@ -17,11 +17,10 @@ io.on('connect', function(socket) {
   socket.on('info', function(display_name) {
     this.display_name = display_name
     room_users.push(display_name)
-    socket.emit('users', room_users)
+    io.sockets.emit('users', room_users)
   })
 
   socket.on('disconnect', function() {
-    console.log(room_users)
     const index = room_users.indexOf(this.display_name)
     if (index > -1) {
       room_users.splice(index, 1);
@@ -38,7 +37,7 @@ io.on('connect', function(socket) {
   })
 
   socket.on('seek', function(position) {
-    // socket.broadcast.emit('seek', position)
+    socket.broadcast.emit('seek', position)
   })
 
   socket.on('song', function(uri) {
