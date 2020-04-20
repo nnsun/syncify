@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <h1>Syncify</h1>
     <Syncify v-if="$store.state.accessToken"></Syncify>
   </div>
 </template>

@@ -172,13 +172,13 @@ export default {
 
         let uri = state.track_window.current_track.uri
         let context = state.context.uri
-        if (uri !== this.uri || state.position == 0) {
+        if (uri !== this.uri) {
           this.uri = uri
           this.song = state.track_window.current_track.name
           this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
           this.length = state.track_window.current_track.duration_ms
           this.album = state.track_window.current_track.album.name
-          this.progress = Math.floor(state.position / 100)
+          this.progress = 0
           this.socket.emit('song', uri, context)
         }
       })
