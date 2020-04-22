@@ -127,6 +127,8 @@ export default {
 
     this.socket.on('song', uri=> {
       console.log('song message received')
+      this.uri = uri
+      this.progress = 0
       const data = {
         uris: [uri],
       }
@@ -171,16 +173,15 @@ export default {
         this.paused = state.paused
 
         let uri = state.track_window.current_track.uri
-        let context = state.context.uri
+
         if (uri !== this.uri) {
-          this.uri = uri
-          this.song = state.track_window.current_track.name
-          this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
-          this.length = state.track_window.current_track.duration_ms
-          this.album = state.track_window.current_track.album.name
-          this.progress = 0
-          this.socket.emit('song', uri, context)
+          this.socket.emit('song', uri)
         }
+        this.uri = uri
+        this.song = state.track_window.current_track.name
+        this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
+        this.length = state.track_window.current_track.duration_ms
+        this.album = state.track_window.current_track.album.name
       })
 
       this.player.connect()
