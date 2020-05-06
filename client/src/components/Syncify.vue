@@ -1,19 +1,19 @@
 <template>
-  <div>
-    <p>{{ song }}</p>
-    <p>{{ artists }}</p>
-    <p>{{ album }}</p>
+  <div v-if="state !== null">
+    <p>{{ track.name }}</p>
+    <p>{{ track.artists.map(obj => obj.name).join(', ') }}</p>
+    <p>{{ track.album.name }}</p>
 
     <div v-if="ready">
       <button @click="previousTrack">Previous</button>
-      <button v-if="paused" @click="resume">{{ 'Play' }}</button>
+      <button v-if="state.paused" @click="resume">{{ 'Play' }}</button>
       <button v-else @click="pause">{{ 'Pause' }}</button>
       <button @click="nextTrack">Next</button>
     </div>
 
     <div class="slider-div">
       <span>{{ songProgress }}</span>
-      <input type="range" min="0" :max="length / 100" v-model="progress" class="slider" @change=seek>
+      <input type="range" min="0" :max="track.duration_ms / 100" v-model="progress" class="slider" @change=seek>
       <span>{{ songLength }}</span>
     </div>
 
@@ -35,12 +35,7 @@ export default {
     return {
       player: null,
       ready: false,
-      song: '',
-      artists: '',
-      length: NaN,
-      album: '',
-      uri: '',
-      paused: true,
+      state: null,
       socket: null,
       users: [],
       progress: 0
@@ -51,24 +46,32 @@ export default {
     resume: function() {
       this.player.resume()
       this.socket.emit('resume')
-      this.paused = false
     },
+
     pause: function() {
       this.player.pause()
       this.socket.emit('pause')
-      this.paused = true
     },
+
     previousTrack: function() {
-      if (this.progress === 0) {
+      if (this.progress < 25) {
         this.player.previousTrack()
       }
       else {
         this.player.seek(0)
       }
+      this.progress = 0
+      this.state.position = 0
+      this.state.timestamp = Date.now()
     },
+
     nextTrack: function() {
       this.player.nextTrack()
+      this.progress = 0
+      this.state.position = 0
+      this.state.timestamp = Date.now()
     },
+
     seek: function() {
       this.player.seek(this.progress * 100)
       this.socket.emit('seek', this.progress * 100)
@@ -76,9 +79,13 @@ export default {
   },
 
   computed: {
+    track: function() {
+      return this.state.track_window.current_track
+    },
+
     songLength: function() {
-      const minutes = Math.floor(this.length / (60 * 1000))
-      const seconds = Math.floor(this.length % (60 * 1000) / 1000)
+      const minutes = Math.floor(this.track.duration_ms / (60 * 1000))
+      const seconds = Math.floor(this.track.duration_ms % (60 * 1000) / 1000)
       return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
     },
 
@@ -125,9 +132,11 @@ export default {
       this.progress = position / 100
     })
 
-    this.socket.on('song', uri=> {
+    this.socket.on('song', uri => {
       console.log('song message received')
-      this.uri = uri
+      if (this.track.uri == uri) {
+        return
+      }
       this.progress = 0
       const data = {
         uris: [uri],
@@ -136,8 +145,14 @@ export default {
     })
 
     setInterval(() => {
-      if (!this.paused) {
-        this.progress = parseInt(this.progress) + 1
+      if (this.state === null) {
+        return
+      }
+      if (!this.state.paused) {
+        this.progress = (this.state.position + (Date.now() - this.state.timestamp)) / 100
+      }
+      else {
+        this.progress = this.state.position / 100
       }
     }, 100)
 
@@ -165,23 +180,24 @@ export default {
           return
         }
 
+        console.log(state)
+
         // account for Spotify bug where sometimes position is in seconds
         if (state.position % 1 !== 0) {
           state.position *= 1000
         }
 
-        this.paused = state.paused
+        if (this.state == null) {
+          this.state = state
+        }
 
         let uri = state.track_window.current_track.uri
 
-        if (uri !== this.uri) {
+        if (uri !== this.track.uri) {
           this.socket.emit('song', uri)
         }
-        this.uri = uri
-        this.song = state.track_window.current_track.name
-        this.artists = state.track_window.current_track.artists.map(obj => obj.name).join(', ')
-        this.length = state.track_window.current_track.duration_ms
-        this.album = state.track_window.current_track.album.name
+
+        this.state = state
       })
 
       this.player.connect()
