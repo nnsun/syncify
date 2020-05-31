@@ -4,12 +4,10 @@
     <p>{{ track.artists.map(obj => obj.name).join(', ') }}</p>
     <p>{{ track.album.name }}</p>
 
-    <div v-if="ready">
-      <button @click="previousTrack">Previous</button>
-      <button v-if="state.paused" @click="resume">{{ 'Play' }}</button>
-      <button v-else @click="pause">{{ 'Pause' }}</button>
-      <button @click="nextTrack">Next</button>
-    </div>
+    <button @click="previousTrack">Previous</button>
+    <button v-if="state.paused" @click="resume">{{ 'Play' }}</button>
+    <button v-else @click="pause">{{ 'Pause' }}</button>
+    <button @click="nextTrack">Next</button>
 
     <div class="slider-div">
       <span>{{ songProgress }}</span>
@@ -34,7 +32,6 @@ export default {
   data() {
     return {
       player: null,
-      ready: false,
       state: null,
       socket: null,
       users: [],
@@ -165,8 +162,6 @@ export default {
       this.player.addListener('initialization_error', ({ message }) => { console.error(message) })
 
       this.player.addListener('ready', ({ device_id }) => {
-        this.ready = true
-
         const data = {
           device_ids: [
             device_id
