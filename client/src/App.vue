@@ -1,16 +1,20 @@
 <template>
   <div id="app">
     <h1>Syncify</h1>
+    <!-- <RoomMenu v-if="!$store.state.room"></RoomMenu> -->
     <Syncify v-if="$store.state.accessToken"></Syncify>
   </div>
 </template>
 
 <script>
+
+// import RoomMenu from '@/components/RoomMenu'
 import Syncify from '@/components/Syncify'
 
 export default {
   name: 'App',
   components: {
+    // RoomMenu,
     Syncify
   },
   mounted: function() {

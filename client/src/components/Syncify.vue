@@ -155,7 +155,7 @@ export default {
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       this.player = new window.Spotify.Player({
-        name: 'Web Playback SDK Quick Start Player',
+        name: 'Syncify Player',
         getOAuthToken: cb => { cb(token) }
       })
 
@@ -197,6 +197,16 @@ export default {
 
       this.player.connect()
     }
+  },
+
+  mounted: function() {
+    const sdk = document.createElement('script');
+    sdk.setAttribute(
+      'src',
+      'https://sdk.scdn.co/spotify-player.js'
+    );
+    sdk.async = true;
+    document.head.appendChild(sdk);
   }
 }
 </script>
