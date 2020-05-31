@@ -7,12 +7,12 @@
             <form v-if="mode">
                 <div>
                     <label>Name
-                        <input type="text" v-model="room">
+                        <input type="text" v-model="room" required>
                     </label>
                 </div>
                 <div>
                     <label>Password
-                        <input type="password" v-model="password">
+                        <input type="password" v-model="password" required>
                     </label>
                 </div>
                 <input type="submit" @click="submit" value="Submit">
@@ -35,8 +35,9 @@ export default {
 
     methods: {
         submit: function() {
-            this.$store.commit('setRoom', this.room)
-            
+            if (this.room && this.password) {
+                this.$store.commit('setRoom', this.room)
+            }
         }
     }
 }

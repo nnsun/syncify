@@ -20,6 +20,10 @@
       <p v-for="user in users" :key="user">{{ user }}</p>
     </div>
 
+    <div>
+      <button @click="exit">Leave room</button>
+    </div>
+
   </div>
 </template>
 
@@ -28,7 +32,7 @@ const axios = require('axios')
 const io = require('socket.io-client')
 
 export default {
-  name: 'Syncify',
+  name: 'Player',
   data() {
     return {
       player: null,
@@ -72,6 +76,10 @@ export default {
     seek: function() {
       this.player.seek(this.progress * 100)
       this.socket.emit('seek', this.progress * 100)
+    },
+
+    exit: function() {
+      this.$store.commit('setRoom', null)
     }
   },
 

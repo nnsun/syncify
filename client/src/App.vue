@@ -1,21 +1,21 @@
 <template>
   <div id="app">
     <h1>Syncify</h1>
-    <!-- <RoomMenu v-if="!$store.state.room"></RoomMenu> -->
-    <Syncify v-if="$store.state.accessToken"></Syncify>
+    <RoomMenu v-if="!$store.state.room"></RoomMenu>
+    <Player v-else-if="$store.state.accessToken"></Player>
   </div>
 </template>
 
 <script>
 
-// import RoomMenu from '@/components/RoomMenu'
-import Syncify from '@/components/Syncify'
+import RoomMenu from '@/components/RoomMenu'
+import Player from '@/components/Player'
 
 export default {
   name: 'App',
   components: {
-    // RoomMenu,
-    Syncify
+    RoomMenu,
+    Player
   },
   mounted: function() {
     let fullPath = this.$route.fullPath
@@ -26,7 +26,7 @@ export default {
         params[paramsList[i]] = paramsList[i + 1]
       }
       this.$store.commit('setAccessToken', params.access_token)
-      this.$router.push({name: 'App'})
+      this.$router.replace({name: 'App'})
     }
     else {
       if (this.$store.state.accessToken === "") {
