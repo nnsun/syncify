@@ -80,6 +80,7 @@ export default {
 
     exit: function() {
       this.$store.commit('setRoom', null)
+      this.socket.disconnect()
     }
   },
 
@@ -113,7 +114,7 @@ export default {
 
     this.socket.on('connect', () => {
       axios.get('https://api.spotify.com/v1/me', config).then(res => {
-        this.socket.emit('info', res.data.display_name)
+        this.socket.emit('info', [res.data.display_name, this.$store.state.room])
       }).catch(err => console.log(err.response))
     })
 
