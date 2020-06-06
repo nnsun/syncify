@@ -10,21 +10,19 @@ app.use(cors())
 
 const rooms = {}
 
-const users = []
-
 app.get('/', function(req, res) {
   res.send('you are: ' + req.get('host'))
 })
 
 app.post('/create', function(req, res) {
-  if (req.room in rooms) {
+  if (req.body.room in rooms) {
     res.status(409).send()
     return
   }
 
-  rooms[req.room] = {
+  rooms[req.body.room] = {
     // TODO: hash password
-    password: req.password,
+    password: req.body.password,
     users: [],
   }
 
@@ -32,33 +30,42 @@ app.post('/create', function(req, res) {
 })
 
 app.post('/join', function(req, res) {
-  if (req.room in rooms) {
-    if (req.data.password !== rooms.room.password) {
-      res.status(401).send()
+  if (req.body.room in rooms) {
+    if (req.data.password === rooms.room.password) {
+      res.status(200).send()
       return
     }
   }
 
-  res.status(200).send()
+  res.status(401).send()
 })
 
 const server = app.listen(process.env.PORT || 3000)
 const io = require('socket.io')(server)
 
 io.on('connect', function(socket) {
-  let display_name = ''
-  socket.on('info', function([display_name, room]) {
-    this.display_name = display_name
-    users.push(display_name)
-    io.sockets.emit('users', users)
+  let room = null
+  let displayName = ''
+
+  socket.on('info', function([displayName, room]) {
+    this.room = room
+    this.displayName = displayName
+    rooms[room].users.push(displayName)
+    io.sockets.emit('users', rooms[room].users)
   })
 
   socket.on('disconnect', function() {
-    const index = users.indexOf(this.display_name)
+    const index = rooms[this.room].users.indexOf(this.displayName)
     if (index > -1) {
-      users.splice(index, 1);
+      rooms[this.room].users.splice(index, 1);
     }
-    socket.broadcast.emit('users', users)
+
+    if (rooms[this.room].users.length == 0) {
+      delete rooms[this.room]
+    }
+    else {
+      socket.broadcast.emit('users', rooms[this.room].users)
+    }
   })
 
   socket.on('pause', function() {

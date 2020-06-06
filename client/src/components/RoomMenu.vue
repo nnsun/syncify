@@ -45,8 +45,7 @@ export default {
                 }
                 if (this.mode === 'create') {
                     let endpoint = serverAddr + '/create'
-                    axios.post(endpoint, data).then(res => {
-                        console.log(res)
+                    axios.post(endpoint, data).then(() => {
                         this.$store.commit('setRoom', this.room)
                     }).catch(err => console.error(err))
                 }
@@ -60,6 +59,5 @@ export default {
         }
     }
 }
-
 
 </script>
