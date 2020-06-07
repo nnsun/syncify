@@ -1,14 +1,17 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const bcrypt = require('bcrypt')
+
 
 const app = express()
 
 app.use(bodyParser.json())
 app.use(cors())
 
-
 const rooms = {}
+
+
 
 app.get('/', function(req, res) {
   res.send('you are: ' + req.get('host'))
@@ -22,7 +25,7 @@ app.post('/create', function(req, res) {
 
   rooms[req.body.room] = {
     // TODO: hash password
-    password: req.body.password,
+    passwordHash: req.body.password,
     users: [],
   }
 
