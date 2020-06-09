@@ -23,9 +23,18 @@ app.post('/create', function(req, res) {
     return
   }
 
+  bcrypt.hash(req.body.password, 10, function(err, result) {
+    if (err) {
+      console.error(err)
+      return
+    }
+    
+    rooms[req.body.room].passwordHash = result
+  })
+
   rooms[req.body.room] = {
     // TODO: hash password
-    passwordHash: req.body.password,
+    passwordHash: null,
     users: [],
   }
 
@@ -34,13 +43,19 @@ app.post('/create', function(req, res) {
 
 app.post('/join', function(req, res) {
   if (req.body.room in rooms) {
-    if (req.data.password === rooms.room.password) {
-      res.status(200).send()
-      return
-    }
+    bcrypt.compare(req.body.password, rooms[req.body.room].passwordHash, function(err, result) {
+      if (result) {
+        res.status(200).send()
+      }
+      else {
+        res.status(401).send()
+      }
+    })
+  }
+  else {
+    res.status(401).send()
   }
 
-  res.status(401).send()
 })
 
 const server = app.listen(process.env.PORT || 3000)
