@@ -1,21 +1,26 @@
 <template>
   <div>
-    <button @click="mode = mode == 'create' ? null : 'create'">Create a room</button>
-    <button @click="mode = mode == 'join' ? null : 'join'">Join a room</button>
+    <div class="inline-block">
+      <button @click="mode='create'" class="btn text-green-500 border-green-500 hover:bg-green-500">Create a room</button>
+      <button @click="mode='join'" class="btn text-blue-500 border-blue-500 hover:bg-blue-500">Join a room</button>
+    </div>
+    
 
-    <div>
-      <form v-if="mode">
+    <div v-if="mode">
+      <form class="">
         <div>
-          <label>Name
-            <input type="text" v-model="room" required autocomplete="off">
-          </label>
+          <input type="text" v-model="room" placeholder="Room name" autocomplete="off"
+              class="form"
+          >
         </div>
         <div>
-          <label>Password
-            <input type="password" v-model="password" required autocomplete="off">
-          </label>
+          <input type="password" v-model="password" placeholder="Password" autocomplete="off"
+              class="form"
+          >
         </div>
-        <input type="submit" @click.prevent="submit" value="Submit">
+        <button @click.prevent="submit" :disabled="submitDisabled"
+            class="btn bg-purple-500 text-white disabled:opacity-50"
+        >Submit</button>
       </form>
     </div>
   </div>
@@ -34,9 +39,15 @@ export default {
     }
   },
 
+  computed: {
+    submitDisabled: function() {
+      return !(this.room && this.password)
+    }
+  },
+
   methods: {
     submit: function() {
-      if (this.room && this.password) {
+      if (!this.submitDisabled) {
         const serverAddr = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_SERVER_ADDR : 'http://localhost:3000'
 
         let data = {

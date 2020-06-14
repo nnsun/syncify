@@ -1,8 +1,11 @@
 <template>
-  <div id="app">
-    <h1>Syncify</h1>
-    <RoomMenu v-if="!$store.state.room"></RoomMenu>
-    <Player v-else-if="$store.state.accessToken"></Player>
+  <div id="app" class="">
+    <div v-if="$store.state.accessToken" class="fixed w-full h-full top-0 text-gray-700 bg-white">
+      <h1 class="text-5xl font-bold mb-4 mt-16">Syncify</h1>
+      <RoomMenu v-if="!$store.state.room"></RoomMenu>
+      <Player v-else></Player>
+    </div>
+    
   </div>
 </template>
 
@@ -13,11 +16,12 @@ import Player from '@/components/Player'
 
 export default {
   name: 'App',
-  components: {
+  components: { 
     RoomMenu,
     Player
   },
-  mounted: function() {
+
+  beforeCreate: function() {
     let fullPath = this.$route.fullPath
     if (fullPath !== '/') {
       let paramsList = fullPath.substring(2).split(/=|&/)
@@ -29,7 +33,7 @@ export default {
       this.$router.replace({name: 'App'})
     }
     else {
-      if (this.$store.state.accessToken === "") {
+      if (this.$store.state.accessToken === '') {
         const callback = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_CALLBACK_ADDR : 'http://localhost:8080'
         const data = {
           client_id: process.env.VUE_APP_CLIENT_ID,
@@ -41,7 +45,6 @@ export default {
         window.open('https://accounts.spotify.com/authorize?' + new URLSearchParams(data).toString(), '_self')
       }
     }
-
   }
 
 }
