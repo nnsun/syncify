@@ -1,8 +1,12 @@
 <template>
   <div>
     <div class="inline-block">
-      <button @click="mode='create'" class="btn text-green-500 border-green-500 hover:bg-green-500">Create a room</button>
-      <button @click="mode='join'" class="btn text-blue-500 border-blue-500 hover:bg-blue-500">Join a room</button>
+      <button @click="mode='create'" 
+          class="btn btn-green" :class="{'btn-active': mode == 'create', 'btn-green-active': mode == 'create'}"
+      >Create a room</button>
+      <button @click="mode='join'" 
+          class="btn btn-blue" :class="{'btn-active': mode == 'join', 'btn-blue-active': mode == 'join'}"
+      >Join a room</button>
     </div>
     
 

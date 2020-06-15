@@ -1,13 +1,13 @@
 <template>
   <div v-if="state !== null">
-    <p>{{ track.name }}</p>
-    <p>{{ track.artists.map(obj => obj.name).join(', ') }}</p>
-    <p>{{ track.album.name }}</p>
+    <h2 class="text-4xl mt-48">{{ track.name }}</h2>
+    <h3 class="text-2xl m-4">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
+    <h3 class="text-2xl m-4">{{ track.album.name }}</h3>
 
-    <button @click="previousTrack">Previous</button>
-    <button v-if="state.paused" @click="resume">{{ 'Play' }}</button>
-    <button v-else @click="pause">{{ 'Pause' }}</button>
-    <button @click="nextTrack">Next</button>
+    <button @click="previousTrack" class="btn">Previous</button>
+    <button v-if="state.paused" @click="resume" class="btn">{{ 'Play' }}</button>
+    <button v-else @click="pause" class="btn">{{ 'Pause' }}</button>
+    <button @click="nextTrack" class="btn">Next</button>
 
     <div class="slider-div">
       <span>{{ songProgress }}</span>
@@ -16,12 +16,12 @@
     </div>
 
     <div>
-      <h3>Users</h3>
-      <p v-for="user in users" :key="user">{{ user }}</p>
+      <h4 class="text-xl mt-24">Users</h4>
+      <p v-for="user in users" :key="user" class="text-base m-2">{{ user }}</p>
     </div>
 
     <div>
-      <button @click="exit">Leave room</button>
+      <button @click="exit" class="btn">Leave room</button>
     </div>
 
   </div>
@@ -76,6 +76,8 @@ export default {
     seek: function() {
       this.player.seek(this.progress * 100)
       this.socket.emit('seek', this.progress * 100)
+      this.state.position = this.progress * 100
+      this.state.timestamp = Date.now
     },
 
     exit: function() {
@@ -115,7 +117,7 @@ export default {
     this.socket.on('connect', () => {
       axios.get('https://api.spotify.com/v1/me', config).then(res => {
         this.socket.emit('info', [res.data.display_name, this.$store.state.room])
-      }).catch(err => console.log(err.response))
+      }).catch(err => console.error(err.response))
     })
 
     this.socket.on('users', users => {
@@ -123,23 +125,19 @@ export default {
     })
 
     this.socket.on('pause', () => {
-      console.log('pause message received')
       this.player.pause()
     })
 
     this.socket.on('resume', () => {
-      console.log('resume message received')
       this.player.resume()
     })
 
     this.socket.on('seek', position => {
-      console.log('seek message received')
-      this.player.seek(position)
       this.progress = position / 100
+      this.player.seek(position)
     })
 
     this.socket.on('song', uri => {
-      console.log('song message received')
       if (this.track.uri == uri) {
         return
       }
@@ -156,9 +154,6 @@ export default {
       }
       if (!this.state.paused) {
         this.progress = (this.state.position + (Date.now() - this.state.timestamp)) / 100
-      }
-      else {
-        this.progress = this.state.position / 100
       }
     }, 100)
 
@@ -183,8 +178,6 @@ export default {
         if (state == null) {
           return
         }
-
-        console.log(state)
 
         // account for Spotify bug where sometimes position is in seconds
         if (state.position % 1 !== 0) {

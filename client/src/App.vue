@@ -16,7 +16,7 @@ import Player from '@/components/Player'
 
 export default {
   name: 'App',
-  components: { 
+  components: {
     RoomMenu,
     Player
   },

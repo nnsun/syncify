@@ -6,13 +6,29 @@
   @apply bg-white font-bold border w-40 py-3 m-2 rounded transition duration-500;
 }
 
-.btn:hover {
+.btn-blue {
+  @apply text-blue-500 border-blue-500 
+}
+
+.btn-green {
+  @apply text-green-500 border-green-500 
+}
+
+.btn:hover, .btn-active {
   @apply border-transparent text-white font-semibold;
 }
 
-.btn-active {
-  btn:hover
+.btn-blue:hover, .btn-blue-active {
+  @apply bg-blue-500
 }
+
+.btn-green:hover, .btn-green-active {
+  @apply bg-green-500
+}
+
+
+
+
 
 .form {
   @apply appearance-none border-b-2 rounded py-2 px-3 my-1 text-gray-700 transition duration-500;
