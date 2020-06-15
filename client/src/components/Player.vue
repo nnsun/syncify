@@ -77,7 +77,7 @@ export default {
       this.player.seek(this.progress * 100)
       this.socket.emit('seek', this.progress * 100)
       this.state.position = this.progress * 100
-      this.state.timestamp = Date.now
+      this.state.timestamp = Date.now()
     },
 
     exit: function() {
