@@ -1,15 +1,15 @@
 <template>
   <div>
     <div class="inline-block">
-      <button @click="mode='create'" 
-          class="btn btn-green" :class="{'btn-active': mode == 'create', 'btn-green-active': mode == 'create'}"
+      <button @click="mode='create'; error=''" 
+          class="menu-btn menu-btn-green" :class="{'menu-btn-active': mode == 'create', 'menu-btn-green-active': mode == 'create'}"
       >Create a room</button>
-      <button @click="mode='join'" 
-          class="btn btn-blue" :class="{'btn-active': mode == 'join', 'btn-blue-active': mode == 'join'}"
+      
+      <button @click="mode='join'; error=''" 
+          class="menu-btn menu-btn-blue" :class="{'menu-btn-active': mode == 'join', 'menu-btn-blue-active': mode == 'join'}"
       >Join a room</button>
     </div>
     
-
     <div v-if="mode">
       <form class="">
         <div>
@@ -22,8 +22,9 @@
               class="form"
           >
         </div>
+        <p class="text-red-500 h-4 my-2">{{ error }}</p>
         <button @click.prevent="submit" :disabled="submitDisabled"
-            class="btn bg-purple-500 text-white disabled:opacity-50"
+            class="menu-btn bg-purple-500 text-white disabled:opacity-50"
         >Submit</button>
       </form>
     </div>
@@ -40,6 +41,7 @@ export default {
       mode: null,
       room: null,
       password: null,
+      error: ''
     }
   },
 
@@ -62,13 +64,21 @@ export default {
           let endpoint = serverAddr + '/create'
           axios.post(endpoint, data).then(() => {
             this.$store.commit('setRoom', this.room)
-          }).catch(err => console.error(err))
+          }).catch(err => {
+            if (err.response.status === 409) {
+              this.error = 'Room name already exists'
+            }
+          })
         }
         else {
           let endpoint = serverAddr + '/join'
           axios.post(endpoint, data).then(() => {
             this.$store.commit('setRoom', this.room)
-          }).catch()
+          }).catch(err => {
+            if (err.response.status === 401) {
+              this.error = 'Incorrect room name or password'
+            }
+          })
         }
       }
     }

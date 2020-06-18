@@ -2,32 +2,29 @@
 
 @tailwind components;
 
-.btn {
+.menu-btn {
   @apply bg-white font-bold border w-40 py-3 m-2 rounded transition duration-500;
 }
 
-.btn-blue {
+.menu-btn-blue {
   @apply text-blue-500 border-blue-500 
 }
 
-.btn-green {
+.menu-btn-green {
   @apply text-green-500 border-green-500 
 }
 
-.btn:hover, .btn-active {
+.menu-btn:hover, .menu-btn-active {
   @apply border-transparent text-white font-semibold;
 }
 
-.btn-blue:hover, .btn-blue-active {
+.menu-btn-blue:hover, .menu-btn-blue-active {
   @apply bg-blue-500
 }
 
-.btn-green:hover, .btn-green-active {
+.menu-btn-green:hover, .menu-btn-green-active {
   @apply bg-green-500
 }
-
-
-
 
 
 .form {
@@ -39,5 +36,37 @@
 }
 
 
+.slider {
+  @apply w-3/5 outline-none rounded-full overflow-hidden appearance-none;
+}
+
+.slider::-webkit-slider-thumb {
+  @apply appearance-none bg-indigo-700 h-2 w-2 overflow-hidden rounded-full;
+  box-shadow: -9999px 0 0 9997px #43e5f7, 9997px 0 0 9999px #ff0000;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  @apply bg-teal-300;
+}
+
+.slider::-moz-range-progress {
+  @apply bg-blue-300;
+}
+
+.slider::-moz-range-track {  
+  @apply bg-indigo-200;
+}
+
+.slider::-moz-range-thumb {
+  @apply bg-gray-500 appearance-none transition duration-500;
+}
+
+.slider::-moz-range-thumb:hover {
+  @apply bg-teal-300;
+}
+
+.media-btn:focus {
+  @apply outline-none;
+}
 
 @tailwind utilities;

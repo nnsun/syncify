@@ -1,18 +1,29 @@
 <template>
   <div v-if="state !== null">
     <h2 class="text-4xl mt-48">{{ track.name }}</h2>
-    <h3 class="text-2xl m-4">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
-    <h3 class="text-2xl m-4">{{ track.album.name }}</h3>
+    <h3 class="text-2xl m-4 text-gray-500">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
+    <h3 class="text-2xl m-4 text-gray-500">{{ track.album.name }}</h3>
 
-    <button @click="previousTrack" class="btn">Previous</button>
-    <button v-if="state.paused" @click="resume" class="btn">{{ 'Play' }}</button>
-    <button v-else @click="pause" class="btn">{{ 'Pause' }}</button>
-    <button @click="nextTrack" class="btn">Next</button>
+    <button @click="previousTrack" class="media-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M12 12h4v24h-4zm7 12l17 12V12z"/></svg>
+    </button>
+    
+    <button v-if="state.paused" @click="resume" class="media-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M16 10v28l22-14z"/></svg>
+    </button>
+    
+    <button v-else @click="pause" class="media-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" class="appearance-none"><path d="M12 38h8V10h-8v28zm16-28v28h8V10h-8z"/></svg>
+    </button>
+    
+    <button @click="nextTrack" class="media-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M12 36l17-12-17-12v24zm20-24v24h4V12h-4z"/></svg>
+    </button>
 
-    <div class="slider-div">
-      <span>{{ songProgress }}</span>
+    <div class="w-full">
+      <span class="mr-2">{{ songProgress }}</span>
       <input type="range" min="0" :max="track.duration_ms / 100" v-model="progress" class="slider" @change=seek>
-      <span>{{ songLength }}</span>
+      <span class="ml-2">{{ songLength }}</span>
     </div>
 
     <div>
@@ -211,14 +222,5 @@ export default {
     document.head.appendChild(sdk);
   }
 }
+
 </script>
-
-<style scoped>
-.slider-div {
-  width: 100%;
-}
-
-.slider {
-  width: 1000px;
-}
-</style>

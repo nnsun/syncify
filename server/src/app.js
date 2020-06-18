@@ -73,16 +73,18 @@ io.on('connect', function(socket) {
   })
 
   socket.on('disconnect', function() {
-    const index = rooms[this.room].users.indexOf(this.displayName)
-    if (index > -1) {
-      rooms[this.room].users.splice(index, 1);
-    }
-
-    if (rooms[this.room].users.length == 0) {
-      delete rooms[this.room]
-    }
-    else {
-      socket.broadcast.emit('users', rooms[this.room].users)
+    if (this.room in rooms) {
+      const index = rooms[this.room].users.indexOf(this.displayName)
+      if (index > -1) {
+        rooms[this.room].users.splice(index, 1);
+      }
+  
+      if (rooms[this.room].users.length == 0) {
+        delete rooms[this.room]
+      }
+      else {
+        socket.broadcast.emit('users', rooms[this.room].users)
+      }
     }
   })
 
