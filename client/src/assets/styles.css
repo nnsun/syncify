@@ -32,7 +32,7 @@
 }
 
 .form:focus {
-  @apply bg-white border-solid border-teal-500;
+  @apply bg-white border-solid border-teal-300;
 }
 
 
