@@ -13,11 +13,11 @@
 }
 
 .menu-btn-blue {
-  @apply text-blue-500 border-blue-500 
+  @apply text-blue-500 border-blue-500
 }
 
 .menu-btn-green {
-  @apply text-green-500 border-green-500 
+  @apply text-green-500 border-green-500
 }
 
 .menu-btn:hover, .menu-btn-active {
@@ -43,13 +43,12 @@
 
 .slider {
   @apply w-3/5 outline-none rounded-full overflow-hidden appearance-none;
-  border: 1px solid white;
 }
 
 .slider::-webkit-slider-thumb {
   @apply appearance-none h-2 w-0 overflow-hidden rounded-full;
   background-color: var(--slider-color-right);
-  box-shadow: -9999px 0 0 9997px var(--slider-color-left), 
+  box-shadow: -9999px 0 0 9999px var(--slider-color-left),
                9997px 0 0 9999px var(--slider-color-right);
 }
 
@@ -58,7 +57,7 @@
   background-color: var(--slider-color-left);
 }
 
-.slider::-moz-range-track {  
+.slider::-moz-range-track {
   @apply border-none;
   background-color: var(--slider-color-right);
 }

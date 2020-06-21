@@ -37,7 +37,7 @@
 
       <div class="w-full">
         <span class="mr-2">{{ songProgress }}</span>
-        <input type="range" min="0" :max="track.duration_ms / 100" v-model="progress" class="slider" @change=seek>
+        <input type="range" min="0" :max="track.duration_ms" v-model.number="progress" class="slider" @change=seek>
         <span class="ml-2">{{ songLength }}</span>
       </div>
 
@@ -99,15 +99,16 @@ export default {
     },
 
     seek: function() {
-      this.player.seek(this.progress * 100)
-      this.socket.emit('seek', this.progress * 100)
-      this.state.position = this.progress * 100
+      this.player.seek(this.progress)
+      this.socket.emit('seek', this.progress)
+      this.state.position = this.progress
       this.state.timestamp = Date.now()
     },
 
     exit: function() {
       this.$store.commit('setRoom', null)
       this.socket.disconnect()
+      this.player.disconnect()
     }
   },
 
@@ -123,8 +124,8 @@ export default {
     },
 
     songProgress: function() {
-      const minutes = Math.floor(this.progress / (60 * 10))
-      const seconds = Math.floor(this.progress % (60 * 10) / 10)
+      const minutes = Math.floor(this.progress / (60 * 1000))
+      const seconds = Math.floor(this.progress % (60 * 1000) / 1000)
       return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
     }
   },
@@ -158,7 +159,7 @@ export default {
     })
 
     this.socket.on('seek', position => {
-      this.progress = position / 100
+      this.progress = position
       this.player.seek(position)
     })
 
@@ -178,7 +179,7 @@ export default {
         return
       }
       if (!this.state.paused) {
-        this.progress = (this.state.position + (Date.now() - this.state.timestamp)) / 100
+        this.progress = this.state.position + (Date.now() - this.state.timestamp)
       }
     }, 100)
 
