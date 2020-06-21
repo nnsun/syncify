@@ -2,6 +2,12 @@
 
 @tailwind components;
 
+:root {
+  --slider-color-left: #4FD1C5;
+  --slider-color-right: #C3DAFE;
+}
+
+
 .menu-btn {
   @apply bg-white font-bold border w-40 py-3 m-2 rounded transition duration-500;
 }
@@ -26,7 +32,6 @@
   @apply bg-green-500
 }
 
-
 .form {
   @apply appearance-none border-b-2 rounded py-2 px-3 my-1 text-gray-700 transition duration-500;
 }
@@ -38,32 +43,34 @@
 
 .slider {
   @apply w-3/5 outline-none rounded-full overflow-hidden appearance-none;
+  border: 1px solid white;
 }
 
 .slider::-webkit-slider-thumb {
-  @apply appearance-none bg-indigo-700 h-2 w-2 overflow-hidden rounded-full;
-  box-shadow: -9999px 0 0 9997px #43e5f7, 9997px 0 0 9999px #ff0000;
-}
-
-.slider::-webkit-slider-thumb:hover {
-  @apply bg-teal-300;
+  @apply appearance-none h-2 w-0 overflow-hidden rounded-full;
+  background-color: var(--slider-color-right);
+  box-shadow: -9999px 0 0 9997px var(--slider-color-left), 
+               9997px 0 0 9999px var(--slider-color-right);
 }
 
 .slider::-moz-range-progress {
-  @apply bg-blue-300;
+  @apply border-none;
+  background-color: var(--slider-color-left);
 }
 
 .slider::-moz-range-track {  
-  @apply bg-indigo-200;
+  @apply border-none;
+  background-color: var(--slider-color-right);
 }
 
 .slider::-moz-range-thumb {
-  @apply bg-gray-500 appearance-none transition duration-500;
+  @apply border-none hidden appearance-none h-0 w-0;
 }
 
-.slider::-moz-range-thumb:hover {
-  @apply bg-teal-300;
+.slider::-moz-focus-outer {
+  @apply border-none;
 }
+
 
 .media-btn:focus {
   @apply outline-none;

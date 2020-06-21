@@ -6,7 +6,7 @@ Simply create a room, have your friends join in, and everyone's playback will be
 
 ## Project Details
 
-The project comprises of a Node.js backend running Express.js and a Vue.js frontend.
+The project comprises of a Node.js backend running Express.js and a Vue.js frontend. It utilizes the [Spotify Web Playback SDK](https://developer.spotify.com/documentation/web-playback-sdk/).
 
 ### Setup
 
