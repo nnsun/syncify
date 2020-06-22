@@ -13,11 +13,15 @@
 }
 
 .menu-btn-blue {
-  @apply text-blue-500 border-blue-500
+  @apply text-blue-500 border-blue-500;
 }
 
 .menu-btn-green {
-  @apply text-green-500 border-green-500
+  @apply text-green-500 border-green-500;
+}
+
+.menu-btn-red {
+  @apply text-red-500 border-red-500;
 }
 
 .menu-btn:hover, .menu-btn-active {
@@ -25,11 +29,15 @@
 }
 
 .menu-btn-blue:hover, .menu-btn-blue-active {
-  @apply bg-blue-500
+  @apply bg-blue-500;
 }
 
 .menu-btn-green:hover, .menu-btn-green-active {
-  @apply bg-green-500
+  @apply bg-green-500;
+}
+
+.menu-btn-red:hover {
+  @apply bg-red-500;
 }
 
 .form {

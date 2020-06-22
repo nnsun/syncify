@@ -68,8 +68,13 @@ io.on('connect', function(socket) {
   socket.on('info', function([displayName, room]) {
     this.room = room
     this.displayName = displayName
-    rooms[room].users.push(displayName)
-    io.sockets.emit('users', rooms[room].users)
+    if (rooms[room]) {
+      rooms[room].users.push(displayName)
+      io.sockets.emit('users', rooms[room].users)
+    }
+    else {
+      io.sockets.emit('users', [displayName])
+    }
   })
 
   socket.on('disconnect', function() {

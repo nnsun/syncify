@@ -5,16 +5,10 @@
 
     <div v-else-if="state !== null">
 
+      <h2 class="text-4xl mt-24 mb-12">{{ track.name }}</h2>
 
-      <h2 class="text-4xl mt-24">{{ track.name }}</h2>
-
-      <div class="inline">
-        <p>{{ $store.state.room }}</p>
-        <button @click="exit" class="btn">Leave room</button>
-      </div>
-
-      <h3 class="text-2xl m-12 text-gray-500">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
-      <h3 class="text-2xl m-12 text-gray-500">{{ track.album.name }}</h3>
+      <h3 class="text-2xl text-gray-500">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
+      <h3 class="text-2xl mb-32 text-gray-500">{{ track.album.name }}</h3>
 
       <div class="m-2">
         <button @click="previousTrack" class="media-btn">
@@ -35,16 +29,21 @@
       </div>
 
 
-      <div class="w-full">
+      <div class="w-full pb-24">
         <span class="mr-2">{{ songProgress }}</span>
         <input type="range" min="0" :max="track.duration_ms" v-model.number="progress" class="slider" @change=seek>
         <span class="ml-2">{{ songLength }}</span>
       </div>
 
-      <!-- <div>
-        <h4 class="text-xl mt-24">Users</h4>
+      <div class="inline">
+        <p class="text-xl">Room: {{ $store.state.room }}</p>
+        <button @click="exit" class="menu-btn menu-btn-red">Leave room</button>
+      </div>
+
+      <div>
+        <h4 class="text-xl mt-6">Users</h4>
         <p v-for="user in users" :key="user" class="text-base m-2">{{ user }}</p>
-      </div> -->
+      </div>
 
     </div>
   </div>
@@ -107,8 +106,14 @@ export default {
 
     exit: function() {
       this.$store.commit('setRoom', null)
-      this.socket.disconnect()
+      this.socket.close()
       this.player.disconnect()
+    },
+
+    msToString: function(ms) {
+      const minutes = Math.floor(ms / (60 * 1000))
+      const seconds = Math.floor(ms % (60 * 1000) / 1000)
+      return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
     }
   },
 
@@ -118,16 +123,12 @@ export default {
     },
 
     songLength: function() {
-      const minutes = Math.floor(this.track.duration_ms / (60 * 1000))
-      const seconds = Math.floor(this.track.duration_ms % (60 * 1000) / 1000)
-      return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
+      return this.msToString(this.track.duration_ms)
     },
 
     songProgress: function() {
-      const minutes = Math.floor(this.progress / (60 * 1000))
-      const seconds = Math.floor(this.progress % (60 * 1000) / 1000)
-      return minutes.toString() + ':' + (seconds < 10 ? '0' + seconds : seconds)
-    }
+      return this.msToString(this.progress)
+    },
   },
 
   created: function() {
@@ -181,7 +182,7 @@ export default {
       if (!this.state.paused) {
         this.progress = this.state.position + (Date.now() - this.state.timestamp)
       }
-    }, 100)
+    }, 200)
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       this.player = new window.Spotify.Player({
@@ -237,6 +238,11 @@ export default {
     );
     sdk.async = true;
     document.head.appendChild(sdk);
+  },
+
+  destroyed: function() {
+    this.socket.close()
+    this.player.disconnect()
   }
 }
 
