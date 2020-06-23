@@ -4,6 +4,8 @@ Syncify is a webapp for listening to Spotify with friends! Check it out at [nnsu
 
 Simply create a room, have your friends join in, and everyone's playback will be synced up!
 
+Please allow some time to join or create a room when first starting up the app. The backend is hosted on Heroku and may need some time to wake up.
+
 ## Project Details
 
 The project comprises of a Node.js backend running Express.js and a Vue.js frontend. It utilizes the [Spotify Web Playback SDK](https://developer.spotify.com/documentation/web-playback-sdk/).
