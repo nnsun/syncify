@@ -84,6 +84,7 @@ export default {
       }
       else {
         this.player.seek(0)
+        this.socket.emit('seek', 0);
       }
       this.progress = 0
       this.state.position = 0
