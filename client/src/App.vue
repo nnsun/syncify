@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div v-if="$store.state.accessToken" class="fixed w-full h-full top-0 text-gray-700 bg-white">
+    <div v-if="$store.state.accessToken" class="fixed w-full h-full top-0 text-gray-700 overflow-auto bg-white">
       <h1 class="text-5xl font-bold mb-4 mt-16">Syncify</h1>
       <RoomMenu v-if="!$store.state.room"></RoomMenu>
       <Player v-else></Player>

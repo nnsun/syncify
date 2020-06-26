@@ -5,10 +5,10 @@
 
     <div v-else-if="state !== null">
 
-      <h2 class="text-4xl mt-24 mb-12">{{ track.name }}</h2>
+      <h2 class="text-4xl my-12">{{ track.name }}</h2>
 
       <h3 class="text-2xl text-gray-500">{{ track.artists.map(obj => obj.name).join(', ') }}</h3>
-      <h3 class="text-2xl mb-32 text-gray-500">{{ track.album.name }}</h3>
+      <h3 class="text-2xl mb-16 text-gray-500">{{ track.album.name }}</h3>
 
       <div class="m-2">
         <button @click="previousTrack" class="media-btn">
@@ -29,7 +29,7 @@
       </div>
 
 
-      <div class="w-full pb-24">
+      <div class="w-full pb-16">
         <span class="mr-2">{{ songProgress }}</span>
         <input type="range" min="0" :max="track.duration_ms" v-model.number="progress" class="slider" @change=seek>
         <span class="ml-2">{{ songLength }}</span>
@@ -37,7 +37,7 @@
 
       <div class="inline">
         <p class="text-xl">Room: {{ $store.state.room }}</p>
-        <button @click="exit" class="menu-btn menu-btn-red">Leave room</button>
+        <button @click="exit" class="menu-btn menu-btn-red">Leave</button>
       </div>
 
       <div>
